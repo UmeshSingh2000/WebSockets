@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        #message {
+            width: 300px;
+            padding: 10px;
+            margin-right: 10px;
+        }
+
+        #sendBtn {
+            padding: 10px 20px;
+        }
+
+        #messagesBox {
+            width: 320px;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 20px;
+        }
+
+        #messagesBox p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Chatting</h1>
+    <div>
+        <input type="text" id="message" placeholder="Enter message">
+        <button id="sendBtn">Send</button>
+    </div>
+    <div id="messagesBox"></div>
+
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+    <script>
+        const socket = io();
+        const btn = document.getElementById('sendBtn');
+        const messageInput = document.getElementById('message');
+        const messagesBox = document.getElementById('messagesBox');
+
+        const sendMessage = () => {
+            const message = messageInput.value.trim();
+            if (message !== '') {
+                socket.emit('user-message', message);
+                messageInput.value = '';
+                messageInput.focus();
+            }
+        };
+
+        btn.addEventListener('click', sendMessage);
+
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        socket.on('message', (message) => {
+            const p = document.createElement('p');
+            p.innerText = message;
+            messagesBox.appendChild(p);
+            messagesBox.scrollTop = messagesBox.scrollHeight;
+        });
+    </script>
+</body>
+
+</html>
